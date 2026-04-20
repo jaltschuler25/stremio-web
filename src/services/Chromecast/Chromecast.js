@@ -2,12 +2,14 @@
 
 const EventEmitter = require('eventemitter3');
 const ChromecastTransport = require('./ChromecastTransport');
+const ChromecastServerTransport = require('./ChromecastServerTransport');
 
 function Chromecast() {
     let active = false;
     let error = null;
     let starting = false;
     let transport = null;
+    let triedServerTransport = false;
 
     const events = new EventEmitter();
 
@@ -17,8 +19,43 @@ function Chromecast() {
         starting = false;
         onStateChanged();
     }
+    function onServerTransportInitError(args) {
+        console.error('ChromecastServerTransport init failed', args);
+        active = false;
+        error = new Error('Chromecast unavailable (server transport)', { cause: args });
+        starting = false;
+        onStateChanged();
+        transport = null;
+    }
     function onTransportInitError(args) {
         console.error(args);
+        if (!triedServerTransport) {
+            triedServerTransport = true;
+            if (transport !== null) {
+                transport.removeAllListeners();
+                transport = null;
+            }
+            ChromecastServerTransport.probeStreamingServer().then(function(serverOk) {
+                if (serverOk) {
+                    transport = new ChromecastServerTransport();
+                    transport.on('init', onTransportInit);
+                    transport.on('init-error', onServerTransportInitError);
+                } else {
+                    active = false;
+                    error = new Error('Google Cast API not available', { cause: args });
+                    starting = false;
+                    onStateChanged();
+                    transport = null;
+                }
+            }).catch(function() {
+                active = false;
+                error = new Error('Google Cast API not available', { cause: args });
+                starting = false;
+                onStateChanged();
+                transport = null;
+            });
+            return;
+        }
         active = false;
         error = new Error('Google Cast API not available', { cause: args });
         starting = false;
@@ -75,6 +112,7 @@ function Chromecast() {
         active = false;
         error = null;
         starting = false;
+        triedServerTransport = false;
         onStateChanged();
         if (transport !== null) {
             transport.removeAllListeners();

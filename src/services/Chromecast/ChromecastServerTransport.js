@@ -1,59 +1,30 @@
 // Copyright (C) 2017-2023 Smart code 203358507
+// Additional Chromecast transport: uses the bundled streaming server's
+// HTTP casting API when the Google Cast Sender SDK is unavailable (e.g. WKWebView).
 
 const EventEmitter = require('eventemitter3');
 const hat = require('hat');
+const runChromecastServerShim = require('./chromecastServerShim');
 
 const MESSAGE_NAMESPACE = 'urn:x-cast:com.stremio';
 const CHUNK_SIZE = 20000;
 
-/** If cast_sender.js never calls the availability hook (e.g. WKWebView), fall back to bundled-server casting. */
-const CAST_API_INIT_TIMEOUT_MS = 8000;
+const DEFAULT_STREAMING_SERVER_URL = 'http://127.0.0.1:11470';
 
-let castAPIAvailable = null;
-const castAPIEvents = new EventEmitter();
-window['__onGCastApiAvailable'] = function(available) {
-    delete window['__onGCastApiAvailable'];
-    castAPIAvailable = !!available;
-    castAPIEvents.emit('availabilityChanged');
-};
-
-const initialize = () => {
-    return new Promise((resolve, reject) => {
-        let settled = false;
-        const timeout = setTimeout(() => {
-            if (settled) {
-                return;
-            }
-            settled = true;
-            castAPIEvents.off('availabilityChanged', onCastAPIAvailabilityChanged);
-            reject(new Error('Cast API initialisation timed out', { cause: 'cast_sender_unavailable' }));
-        }, CAST_API_INIT_TIMEOUT_MS);
-        function onCastAPIAvailabilityChanged() {
-            if (settled) {
-                return;
-            }
-            settled = true;
-            clearTimeout(timeout);
-            castAPIEvents.off('availabilityChanged', onCastAPIAvailabilityChanged);
-            if (castAPIAvailable) {
-                resolve();
-            } else {
-                reject(new Error('window.cast api not available', { cause: 'castAPIAvailable is null.' }));
-            }
-        }
-        if (castAPIAvailable !== null) {
-            onCastAPIAvailabilityChanged();
-        } else {
-            castAPIEvents.on('availabilityChanged', onCastAPIAvailabilityChanged);
-        }
-    });
-};
-
-function ChromecastTransport() {
+function ChromecastServerTransport() {
     const events = new EventEmitter();
     const messages = {};
 
-    initialize()
+    runChromecastServerShim({ serverUrl: DEFAULT_STREAMING_SERVER_URL });
+
+    if (typeof cast === 'undefined' || !cast.framework) {
+        setTimeout(() => {
+            events.emit('init-error', new Error('Cast server shim did not initialise window.cast'));
+        }, 0);
+        return;
+    }
+
+    Promise.resolve()
         .then(() => {
             cast.framework.CastContext.getInstance().addEventListener(
                 cast.framework.CastContextEventType.CAST_STATE_CHANGED,
@@ -68,7 +39,7 @@ function ChromecastTransport() {
             try {
                 events.emit('init');
             } catch (error) {
-                console.error('ChromecastTransport', error);
+                console.error('ChromecastServerTransport', error);
             }
         })
         .catch((error) => {
@@ -189,4 +160,19 @@ function ChromecastTransport() {
     };
 }
 
-module.exports = ChromecastTransport;
+ChromecastServerTransport.probeStreamingServer = async function(serverUrl = DEFAULT_STREAMING_SERVER_URL) {
+    try {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 2000);
+        const res = await fetch(`${serverUrl}/settings`, {
+            cache: 'no-store',
+            signal: controller.signal
+        });
+        clearTimeout(timer);
+        return res.ok || res.status === 307;
+    } catch {
+        return false;
+    }
+};
+
+module.exports = ChromecastServerTransport;

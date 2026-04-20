@@ -28,6 +28,7 @@ const useVideo = require('./useVideo');
 const styles = require('./styles');
 const Video = require('./Video');
 const { default: Indicator } = require('./Indicator/Indicator');
+const { CastState, CastContextEventType } = require('stremio/services/Chromecast/castFrameworkEnums');
 
 const findTrackByLang = (tracks, lang) => tracks.find((track) => track.lang === lang || langs.where('1', track.lang)?.[2] === lang);
 const findTrackById = (tracks, id) => tracks.find((track) => track.id === id);
@@ -52,7 +53,7 @@ const Player = ({ urlParams, queryParams }) => {
     const [seeking, setSeeking] = React.useState(false);
 
     const [casting, setCasting] = React.useState(() => {
-        return services.chromecast.active && services.chromecast.transport.getCastState() === cast.framework.CastState.CONNECTED;
+        return services.chromecast.active && services.chromecast.transport.getCastState() === CastState.CONNECTED;
     });
     const playbackDevices = React.useMemo(() => streamingServer.playbackDevices !== null && streamingServer.playbackDevices.type === 'Ready' ? streamingServer.playbackDevices.content : [], [streamingServer]);
 
@@ -550,13 +551,13 @@ const Player = ({ urlParams, queryParams }) => {
         const toastFilter = (item) => item?.dataset?.type === 'CoreEvent';
         toast.addFilter(toastFilter);
         const onCastStateChange = () => {
-            setCasting(services.chromecast.active && services.chromecast.transport.getCastState() === cast.framework.CastState.CONNECTED);
+            setCasting(services.chromecast.active && services.chromecast.transport.getCastState() === CastState.CONNECTED);
         };
         const onChromecastServiceStateChange = () => {
             onCastStateChange();
             if (services.chromecast.active) {
                 services.chromecast.transport.on(
-                    cast.framework.CastContextEventType.CAST_STATE_CHANGED,
+                    CastContextEventType.CAST_STATE_CHANGED,
                     onCastStateChange
                 );
             }
@@ -576,7 +577,7 @@ const Player = ({ urlParams, queryParams }) => {
             services.core.transport.off('CoreEvent', onCoreEvent);
             if (services.chromecast.active) {
                 services.chromecast.transport.off(
-                    cast.framework.CastContextEventType.CAST_STATE_CHANGED,
+                    CastContextEventType.CAST_STATE_CHANGED,
                     onCastStateChange
                 );
             }

@@ -77,7 +77,10 @@ const App = () => {
             );
         };
         const onChromecastStateChange = () => {
-            if (services.chromecast.active) {
+            if (services.chromecast.active &&
+                typeof chrome !== 'undefined' &&
+                chrome.cast &&
+                typeof chrome.cast.AutoJoinPolicy !== 'undefined') {
                 services.chromecast.transport.setOptions({
                     receiverApplicationId: CONSTANTS.CHROMECAST_RECEIVER_APP_ID,
                     autoJoinPolicy: chrome.cast.AutoJoinPolicy.PAGE_SCOPED,
