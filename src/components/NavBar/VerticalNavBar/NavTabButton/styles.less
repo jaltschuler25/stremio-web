@@ -80,3 +80,21 @@
         }
     }
 }
+
+// TV: subtle highlight + scale on focus instead of outline
+:global(html.webos-tv) {
+    .nav-tab-button-container {
+        &:focus, &:focus-visible {
+            background-color: rgba(255, 255, 255, 0.12) !important;
+            border-radius: var(--border-radius);
+            transform: scale(1.05);
+            transition: all 200ms ease-out;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        .label {
+            opacity: 0.6;
+        }
+    }
+}

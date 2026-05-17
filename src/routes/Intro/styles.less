@@ -333,3 +333,56 @@
         }
     }
 }
+
+// TV: hide OAuth, enlarge form, single-column layout
+.intro-container {
+    :global(html.webos-tv) & {
+        .content-container {
+            flex-direction: column;
+            align-items: center;
+
+            .form-container {
+                width: 28rem;
+                margin: 0 auto;
+
+                .credentials-text-input {
+                    min-height: 3.5rem;
+                    padding: 1.25rem 1.5rem;
+                    font-size: 1.1rem;
+                    margin-bottom: 1.25rem;
+
+                    &:focus, &:focus-visible {
+                        outline: 2px solid var(--primary-foreground-color) !important;
+                    }
+                }
+
+                .forgot-password-link-container .forgot-password-link {
+                    min-height: 3rem;
+                    padding: 0.75rem 1rem;
+                    font-size: 1.05rem;
+                }
+            }
+
+            .form-button {
+                min-height: 4.5rem;
+                font-size: 1.15rem;
+
+                &:focus, &:focus-visible {
+                    outline: 3px solid var(--primary-foreground-color) !important;
+                    transform: scale(1.02);
+                }
+            }
+
+            .options-container {
+                width: 28rem;
+                margin: 2rem auto 0;
+
+                // Hide OAuth buttons on TV -- they open external browsers
+                .facebook-button,
+                .apple-button {
+                    display: none !important;
+                }
+            }
+        }
+    }
+}

@@ -200,3 +200,29 @@
         }
     }
 }
+
+// TV: fewer columns, larger controls, more spacing
+.library-container {
+    :global(html.webos-tv) & {
+        .library-content {
+            .meta-items-container {
+                grid-template-columns: repeat(6, 1fr) !important;
+                grid-gap: 0.75rem;
+                padding: 0 2rem;
+            }
+
+            .selectable-inputs-container {
+                padding: 1.5rem 2rem;
+
+                .select-input-container {
+                    height: 3.5rem;
+                    flex-basis: 18rem;
+
+                    &:focus-within {
+                        box-shadow: 0 0 0 2px var(--primary-foreground-color);
+                    }
+                }
+            }
+        }
+    }
+}

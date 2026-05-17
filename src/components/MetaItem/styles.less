@@ -381,3 +381,38 @@
         }
     }
 }
+
+// TV: Netflix-style focus with scale + glow instead of outline
+:global(html.webos-tv) {
+    .meta-item-container {
+        transition: transform 200ms ease-out;
+        overflow: visible;
+
+        .poster-image-layer .poster-image {
+            opacity: 0.85;
+            transition: opacity 200ms ease-out;
+        }
+
+        &:focus, &:focus-visible {
+            z-index: 10;
+            transform: scale(1.08);
+            outline: none !important;
+
+            .poster-container {
+                box-shadow:
+                    0 0 0 3px var(--primary-foreground-color),
+                    0 8px 24px rgba(0, 0, 0, 0.6),
+                    0 0 20px rgba(255, 255, 255, 0.35) !important;
+            }
+
+            .poster-image-layer .poster-image {
+                opacity: 1;
+            }
+        }
+
+        .title-bar-container .title-label {
+            font-size: 1.05rem;
+            font-weight: 500;
+        }
+    }
+}

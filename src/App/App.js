@@ -4,7 +4,7 @@ require('spatial-navigation-polyfill');
 const React = require('react');
 const { useTranslation } = require('react-i18next');
 const { Router } = require('stremio-router');
-const { Core, Shell, Chromecast, DragAndDrop, KeyboardShortcuts, ServicesProvider } = require('stremio/services');
+const { Core, Shell, Chromecast, DragAndDrop, KeyboardShortcuts, WebOSRemote, ServicesProvider } = require('stremio/services');
 const { NotFound } = require('stremio/routes');
 const { FileDropProvider, PlatformProvider, ToastProvider, TooltipProvider, ShortcutsProvider, CONSTANTS, withCoreSuspender, useShell, useBinaryState } = require('stremio/common');
 const ServicesToaster = require('./ServicesToaster');
@@ -35,6 +35,7 @@ const App = () => {
             shell: new Shell(),
             chromecast: new Chromecast(),
             keyboardShortcuts: new KeyboardShortcuts(),
+            webOSRemote: new WebOSRemote(),
             dragAndDrop: new DragAndDrop({ core })
         };
     }, []);
@@ -97,6 +98,7 @@ const App = () => {
         services.shell.start();
         services.chromecast.start();
         services.keyboardShortcuts.start();
+        services.webOSRemote.start();
         services.dragAndDrop.start();
         window.services = services;
         return () => {
@@ -104,6 +106,7 @@ const App = () => {
             services.shell.stop();
             services.chromecast.stop();
             services.keyboardShortcuts.stop();
+            services.webOSRemote.stop();
             services.dragAndDrop.stop();
             services.core.off('stateChanged', onCoreStateChanged);
             services.shell.off('stateChanged', onShellStateChanged);

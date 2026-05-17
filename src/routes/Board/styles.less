@@ -230,3 +230,22 @@
         }
     }
 }
+
+// TV: show all items (carousel handles overflow scrolling) + extra spacing
+.board-container {
+    :global(html.webos-tv) & {
+        .board-content-container .board-content {
+            padding: 0 2rem;
+
+            .board-row {
+                margin-bottom: 2.5rem;
+            }
+
+            .board-row-poster, .board-row-square, .board-row-landscape, .continue-watching-row {
+                .meta-item, .meta-item-placeholder {
+                    display: flex !important;
+                }
+            }
+        }
+    }
+}

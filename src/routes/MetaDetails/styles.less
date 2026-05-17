@@ -155,3 +155,30 @@
         }
     }
 }
+
+// TV: vertical stack layout -- full-width preview on top, streams below
+.metadetails-container {
+    :global(html.webos-tv) & {
+        .metadetails-content {
+            flex-direction: column;
+            overflow-y: auto;
+
+            .meta-preview {
+                flex: none;
+                padding: 0 3rem 1.5rem;
+            }
+
+            .spacing {
+                display: none;
+            }
+
+            .videos-list, .streams-list {
+                flex: 1 1 auto;
+                min-height: 40vh;
+                border-radius: var(--border-radius) var(--border-radius) 0 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                backdrop-filter: blur(20px);
+            }
+        }
+    }
+}

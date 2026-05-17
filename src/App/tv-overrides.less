@@ -1,0 +1,89 @@
+// TV-specific style overrides for 10-foot viewing distance
+// Only contains rules that work at the global/element level.
+// Component-specific TV overrides live in each component's own .less file
+// using the `:global(html.webos-tv) &` pattern to match hashed class names.
+
+:global {
+    // Disable default outlines on TV — components provide their own focus states
+    html.webos-tv *:focus {
+        outline: none !important;
+    }
+
+    html.webos-tv *:focus-visible {
+        outline: none !important;
+    }
+
+    // Larger hit targets for D-pad / pointer navigation
+    html.webos-tv button,
+    html.webos-tv a,
+    html.webos-tv [tabindex] {
+        min-height: 2.5rem;
+        min-width: 2.5rem;
+    }
+
+    // Hide scrollbars — no mouse on TV
+    html.webos-tv ::-webkit-scrollbar {
+        display: none;
+    }
+
+    html.webos-tv * {
+        scrollbar-width: none;
+    }
+
+    html.webos-tv {
+        cursor: none;
+        font-size: 20px !important;
+
+        // TV-tuned CSS custom variables (these work because they target the element)
+        --horizontal-nav-bar-size: 4.5rem;
+        --vertical-nav-bar-size: 5rem;
+        --border-radius: 0.5rem;
+
+        // Smooth scroll for all scrollable containers
+        * {
+            scroll-behavior: smooth;
+        }
+    }
+
+    // General focusable elements on TV: soft glow border
+    html.webos-tv button:focus-visible,
+    html.webos-tv a:focus-visible,
+    html.webos-tv [tabindex]:focus-visible {
+        box-shadow: 0 0 0 2px var(--primary-foreground-color), 0 0 12px rgba(255, 255, 255, 0.35);
+        border-radius: var(--border-radius);
+        transition: box-shadow 200ms ease-out;
+    }
+
+    // Animation overrides (these are already global classes from animations.less)
+    html.webos-tv .fade-active {
+        transition: opacity 300ms cubic-bezier(0.25, 0.1, 0.25, 1) !important;
+    }
+
+    html.webos-tv .slide-left-active {
+        transition: transform 400ms cubic-bezier(0.25, 0.1, 0.25, 1) !important;
+    }
+
+    html.webos-tv .animation-fade-in {
+        animation-duration: 500ms !important;
+    }
+
+    // Spatial navigation containment on scroll containers and modals
+    html.webos-tv [style*='overflow-y: auto'],
+    html.webos-tv [style*='overflow-y: scroll'] {
+        --spatial-navigation-contain: contain;
+    }
+
+    // Performance: reduce expensive GPU operations on TV hardware
+    html.webos-tv {
+        // Limit backdrop-filter usage -- expensive on low-end GPU
+        * {
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+        }
+
+        // Only apply will-change on elements that are actively transitioning
+        *:not(:focus):not(:hover) {
+            will-change: auto !important;
+        }
+    }
+}

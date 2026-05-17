@@ -329,3 +329,39 @@
         }
     }
 }
+
+// TV: hide "Add by URL", larger controls, focusable addon rows
+.addons-container {
+    :global(html.webos-tv) & {
+        .addons-content {
+            .selectable-inputs-container {
+                padding: 1.5rem 2rem;
+
+                // Hide URL paste button on TV -- unusable with remote
+                .add-button-container {
+                    display: none !important;
+                }
+
+                .select-input-container {
+                    min-height: 3.5rem;
+
+                    &:focus-within {
+                        box-shadow: 0 0 0 2px var(--primary-foreground-color);
+                    }
+                }
+
+                .search-bar {
+                    flex-basis: 22rem;
+                }
+            }
+
+            .addons-list-container {
+                padding: 0 2rem;
+
+                .addon {
+                    margin-bottom: 1rem;
+                }
+            }
+        }
+    }
+}

@@ -22,12 +22,15 @@ const { default: AudioMenu } = require('./AudioMenu');
 const SpeedMenu = require('./SpeedMenu');
 const { default: SideDrawerButton } = require('./SideDrawerButton');
 const { default: SideDrawer } = require('./SideDrawer');
+const SeekIndicator = require('./SeekIndicator');
 const usePlayer = require('./usePlayer');
 const useStatistics = require('./useStatistics');
 const useVideo = require('./useVideo');
 const styles = require('./styles');
 const Video = require('./Video');
 const { default: Indicator } = require('./Indicator/Indicator');
+
+const isTV = () => typeof document !== 'undefined' && document.documentElement.classList.contains('webos-tv');
 const { CastState, CastContextEventType } = require('stremio/services/Chromecast/castFrameworkEnums');
 
 const findTrackByLang = (tracks, lang) => tracks.find((track) => track.lang === lang || langs.where('1', track.lang)?.[2] === lang);
@@ -52,6 +55,16 @@ const Player = ({ urlParams, queryParams }) => {
 
     const [seeking, setSeeking] = React.useState(false);
 
+    // TV seek direction indicator state
+    const [seekDirection, setSeekDirection] = React.useState(null);
+    const seekIndicatorTimer = React.useRef(null);
+    const showSeekIndicator = React.useCallback((direction) => {
+        if (!isTV()) return;
+        setSeekDirection(direction);
+        if (seekIndicatorTimer.current) clearTimeout(seekIndicatorTimer.current);
+        seekIndicatorTimer.current = setTimeout(() => setSeekDirection(null), 600);
+    }, []);
+
     const [casting, setCasting] = React.useState(() => {
         return services.chromecast.active && services.chromecast.transport.getCastState() === CastState.CONNECTED;
     });
@@ -61,7 +74,7 @@ const Player = ({ urlParams, queryParams }) => {
     const errorRef = React.useRef();
 
     const [immersed, setImmersed] = React.useState(true);
-    const setImmersedDebounced = React.useCallback(debounce(setImmersed, 3000), []);
+    const setImmersedDebounced = React.useCallback(debounce(setImmersed, isTV() ? 5000 : 3000), []);
     const [, , , toggleFullscreen] = useFullscreen();
 
     const [optionsMenuOpen, , closeOptionsMenu, toggleOptionsMenu] = useBinaryState(false);
@@ -450,10 +463,10 @@ const Player = ({ urlParams, queryParams }) => {
         }
     }, [player.nextVideo, video.state.time, video.state.duration]);
 
-    // Auto subtitles track selection
+    // Auto subtitles track selection (disabled on TV -- subtitles off by default)
     React.useEffect(() => {
         if (!defaultSubtitlesSelected.current) {
-            if (settings.subtitlesLanguage === null) {
+            if (settings.subtitlesLanguage === null || isTV()) {
                 video.setSubtitlesTrack(null);
                 video.setExtraSubtitlesTrack(null);
                 defaultSubtitlesSelected.current = true;
@@ -642,16 +655,18 @@ const Player = ({ urlParams, queryParams }) => {
             const seekDuration = combo === 1 ? settings.seekShortTimeDuration : settings.seekTimeDuration;
             setSeeking(true);
             onSeekRequested(video.state.time + seekDuration);
+            showSeekIndicator('forward');
         }
-    }, [video.state.time, onSeekRequested], !menusOpen);
+    }, [video.state.time, onSeekRequested, showSeekIndicator], !menusOpen);
 
     onShortcut('seekBackward', (combo) => {
         if (video.state.time !== null) {
             const seekDuration = combo === 1 ? settings.seekShortTimeDuration : settings.seekTimeDuration;
             setSeeking(true);
             onSeekRequested(video.state.time - seekDuration);
+            showSeekIndicator('backward');
         }
-    }, [video.state.time, onSeekRequested], !menusOpen);
+    }, [video.state.time, onSeekRequested, showSeekIndicator], !menusOpen);
 
     onShortcut('mute', () => {
         video.state.muted === true ? onUnmuteRequested() : onMuteRequested();
@@ -748,9 +763,12 @@ const Player = ({ urlParams, queryParams }) => {
     }, []);
 
     onShortcut('exit', () => {
-        closeMenus();
+        if (menusOpen) {
+            closeMenus();
+            return;
+        }
         !settings.escExitFullscreen && window.history.back();
-    }, [settings.escExitFullscreen]);
+    }, [settings.escExitFullscreen, menusOpen]);
 
     React.useLayoutEffect(() => {
         if (menusOpen) {
@@ -869,6 +887,7 @@ const Player = ({ urlParams, queryParams }) => {
             setImmersedDebounced.cancel();
             onPlayRequestedDebounced.cancel();
             onPauseRequestedDebounced.cancel();
+            if (seekIndicatorTimer.current) clearTimeout(seekIndicatorTimer.current);
         };
     }, []);
 
@@ -928,6 +947,20 @@ const Player = ({ urlParams, queryParams }) => {
                     :
                     null
             }
+            {isTV() && (
+                <React.Fragment>
+                    <SeekIndicator
+                        direction={'backward'}
+                        visible={seekDirection === 'backward'}
+                        duration={settings.seekShortTimeDuration}
+                    />
+                    <SeekIndicator
+                        direction={'forward'}
+                        visible={seekDirection === 'forward'}
+                        duration={settings.seekShortTimeDuration}
+                    />
+                </React.Fragment>
+            )}
             <ContextMenu on={[video.containerRef, bufferingRef, errorRef]} autoClose>
                 <OptionsMenu
                     className={classnames(styles['layer'], styles['menu-layer'])}

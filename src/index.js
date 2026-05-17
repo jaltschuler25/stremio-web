@@ -11,6 +11,11 @@ if (browser?.platform?.type === 'desktop') {
     document.querySelector('meta[name="viewport"]')?.setAttribute('content', '');
 }
 
+// Detect webOS TV environment and apply TV-specific class for style overrides
+if (typeof window.webOS !== 'undefined' || /webOS|Web0S/i.test(window.navigator?.userAgent || '')) {
+    document.documentElement.classList.add('webos-tv');
+}
+
 const React = require('react');
 const ReactDOM = require('react-dom/client');
 const i18n = require('i18next');

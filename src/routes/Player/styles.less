@@ -2,7 +2,6 @@
 
 @import (reference) '~@stremio/stremio-colors/less/stremio-colors.less';
 @import (reference) '~stremio/common/screen-sizes.less';
-
 :import('~stremio/components/Slider/styles.less') {
     active-slider-within: active-slider-within;
 }
@@ -154,6 +153,56 @@ html:not(.active-slider-within) {
             &.menu-layer {
                 right: 2.5rem;
                 bottom: 11rem;
+            }
+        }
+    }
+}
+
+// TV: cinematic transitions for player overlay layers
+html:not(.active-slider-within) {
+    :global(html.webos-tv) & {
+        .player-container.overlayHidden {
+            .nav-bar-layer, .control-bar-layer, .menu-layer, .side-drawer-button-layer {
+                opacity: 0;
+                transition: opacity 400ms ease-in-out !important;
+            }
+        }
+    }
+}
+
+// TV: centered menus, larger side drawer, bigger nav bar
+.player-container {
+    :global(html.webos-tv) & {
+        .layer {
+            &.nav-bar-layer {
+                padding: 0.5rem 1rem;
+                background: linear-gradient(
+                    to bottom,
+                    rgba(0, 0, 0, 0.85) 0%,
+                    rgba(0, 0, 0, 0.4) 60%,
+                    transparent 100%
+                );
+            }
+
+            &.menu-layer {
+                top: 50%;
+                left: 50%;
+                right: auto;
+                bottom: auto;
+                transform: translate(-50%, -50%);
+                max-height: 70vh;
+                max-width: 50vw;
+                min-width: 30rem;
+                border-radius: 1rem;
+            }
+
+            &.side-drawer-layer {
+                width: 40vw;
+                min-width: 28rem;
+            }
+
+            &.side-drawer-button-layer {
+                right: 0;
             }
         }
     }

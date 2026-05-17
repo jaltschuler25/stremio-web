@@ -242,3 +242,47 @@
         }
     }
 }
+
+// TV: larger addon cards, focusable buttons
+:global(html.webos-tv) {
+    .addon-container {
+        padding: 1.5rem 2rem;
+        transition: background-color 200ms ease-out, transform 200ms ease-out, box-shadow 200ms ease-out;
+
+        &:focus, &:focus-visible {
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.08);
+            transform: scale(1.01);
+            box-shadow: 0 0 0 2px var(--primary-foreground-color), 0 4px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        .info-container {
+            .name-container {
+                font-size: 1.4rem;
+            }
+
+            .description-container {
+                font-size: 1.05rem;
+            }
+        }
+
+        .buttons-container {
+            .install-button-container,
+            .uninstall-button-container,
+            .configure-button-container,
+            .share-button-container {
+                min-height: 4rem;
+
+                &:focus, &:focus-visible {
+                    outline: 2px solid var(--primary-foreground-color);
+                    background-color: transparent;
+                    opacity: 1;
+                }
+
+                .label {
+                    font-size: 1.05rem;
+                }
+            }
+        }
+    }
+}

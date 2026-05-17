@@ -5,7 +5,7 @@ const classnames = require('classnames');
 const debounce = require('lodash.debounce');
 const useTranslate = require('stremio/common/useTranslate');
 const { useStreamingServer, useNotifications, withCoreSuspender, getVisibleChildrenRange, useProfile } = require('stremio/common');
-const { ContinueWatchingItem, EventModal, MainNavBars, MetaItem, MetaRow } = require('stremio/components');
+const { ContinueWatchingItem, EventModal, HeroBillboard, MainNavBars, MetaItem, MetaRow } = require('stremio/components');
 const useBoard = require('./useBoard');
 const useContinueWatchingPreview = require('./useContinueWatchingPreview');
 const styles = require('./styles');
@@ -22,6 +22,14 @@ const Board = () => {
     const profile = useProfile();
     const boardCatalogsOffset = continueWatchingPreview.items.length > 0 ? 1 : 0;
     const scrollContainerRef = React.useRef();
+    const isTV = typeof document !== 'undefined' && document.documentElement.classList.contains('webos-tv');
+
+    // Extract hero items from the first ready catalog for the TV billboard
+    const heroItems = React.useMemo(() => {
+        if (!isTV) return null;
+        const firstReady = board.catalogs.find((c) => c.content?.type === 'Ready');
+        return firstReady?.content?.content?.slice(0, 5) ?? null;
+    }, [isTV, board.catalogs]);
     const showStreamingServerWarning = React.useMemo(() => {
         return streamingServer.settings !== null && streamingServer.settings.type === 'Err' && (
             isNaN(profile.settings.streamingServerWarningDismissed.getTime()) ||
@@ -50,6 +58,12 @@ const Board = () => {
             <EventModal />
             <MainNavBars className={styles['board-content-container']} route={'board'}>
                 <div ref={scrollContainerRef} className={styles['board-content']} onScroll={onScroll}>
+                    {heroItems && heroItems.length > 0 && (
+                        <HeroBillboard
+                            className={styles['hero-billboard']}
+                            items={heroItems}
+                        />
+                    )}
                     {
                         continueWatchingPreview.items.length > 0 ?
                             <MetaRow

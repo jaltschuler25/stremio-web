@@ -56,9 +56,28 @@ module.exports = (env, argv) => ({
                         loader: 'babel-loader',
                         options: {
                             presets: [
-                                '@babel/preset-env',
+                                ['@babel/preset-env', {
+                                    targets: 'chrome 79',
+                                }],
                                 '@babel/preset-react'
                             ],
+                        }
+                    }
+                ]
+            },
+            {
+                test: /\.js$/,
+                include: /node_modules/,
+                use: [
+                    {
+                        loader: 'babel-loader',
+                        options: {
+                            presets: [
+                                ['@babel/preset-env', {
+                                    targets: 'chrome 79',
+                                }],
+                            ],
+                            sourceType: 'unambiguous',
                         }
                     }
                 ]
@@ -195,7 +214,8 @@ module.exports = (env, argv) => ({
                 test: /\.js$/,
                 extractComments: false,
                 terserOptions: {
-                    ecma: 5,
+                    ecma: 2019,
+                    safari10: true,
                     mangle: true,
                     warnings: false,
                     output: {

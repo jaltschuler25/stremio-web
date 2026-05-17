@@ -3,6 +3,7 @@
 import React, { memo } from 'react';
 import classnames from 'classnames';
 import { VerticalNavBar, HorizontalNavBar } from 'stremio/components/NavBar';
+const useTVNavAutoHide = require('stremio/common/useTVNavAutoHide');
 import styles from './MainNavBars.less';
 
 const TABS = [
@@ -22,8 +23,14 @@ type Props = {
 };
 
 const MainNavBars = memo(({ className, route, query, children }: Props) => {
+    const { navHidden } = useTVNavAutoHide();
+
     return (
-        <div className={classnames(className, styles['main-nav-bars-container'])}>
+        <div className={classnames(
+            className,
+            styles['main-nav-bars-container'],
+            { 'tv-nav-hidden': navHidden }
+        )}>
             <HorizontalNavBar
                 className={styles['horizontal-nav-bar']}
                 route={route}
@@ -32,11 +39,13 @@ const MainNavBars = memo(({ className, route, query, children }: Props) => {
                 searchBar={true}
                 fullscreenButton={true}
                 navMenu={true}
+                data-tv-nav="true"
             />
             <VerticalNavBar
                 className={styles['vertical-nav-bar']}
                 selected={route}
                 tabs={TABS}
+                data-tv-nav="true"
             />
             <div className={styles['nav-content-container']}>{children}</div>
         </div>

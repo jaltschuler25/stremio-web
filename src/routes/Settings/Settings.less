@@ -33,3 +33,14 @@
         }
     }
 }
+
+// TV: larger targets, always-visible side menu
+.settings-container {
+    :global(html.webos-tv) & {
+        .settings-content {
+            .sections-container {
+                padding: 0 3rem 3rem;
+            }
+        }
+    }
+}

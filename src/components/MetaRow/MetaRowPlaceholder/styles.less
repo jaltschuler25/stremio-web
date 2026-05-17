@@ -109,3 +109,37 @@
         }
     }
 }
+
+// TV: shimmer animation on loading placeholders
+:global(html.webos-tv) {
+    @keyframes tv-shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+
+    .meta-row-placeholder-container {
+        .meta-items-container .meta-item {
+            .poster-container {
+                background: linear-gradient(
+                    90deg,
+                    var(--color-placeholder-background) 25%,
+                    rgba(255, 255, 255, 0.06) 50%,
+                    var(--color-placeholder-background) 75%
+                );
+                background-size: 200% 100%;
+                animation: tv-shimmer 1.5s ease-in-out infinite;
+            }
+
+            .title-bar-container .title-label {
+                background: linear-gradient(
+                    90deg,
+                    var(--color-placeholder-background) 25%,
+                    rgba(255, 255, 255, 0.06) 50%,
+                    var(--color-placeholder-background) 75%
+                );
+                background-size: 200% 100%;
+                animation: tv-shimmer 1.5s ease-in-out infinite;
+            }
+        }
+    }
+}

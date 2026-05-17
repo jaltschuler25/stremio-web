@@ -176,3 +176,45 @@
         }
     }
 }
+
+// TV: larger modal, bigger buttons, focusable controls
+:global(html.webos-tv) {
+    .modal-container {
+        .modal-dialog-container {
+            max-width: 70%;
+            padding: 1rem 2.5rem;
+
+            .close-button-container {
+                width: 3.5rem;
+                height: 3.5rem;
+
+                &:focus, &:focus-visible {
+                    outline: 2px solid var(--primary-foreground-color);
+                    .icon {
+                        opacity: 1;
+                    }
+                }
+            }
+
+            .modal-dialog-content {
+                .title-container {
+                    font-size: 1.4rem;
+                    min-height: 4.5rem;
+                }
+            }
+        }
+    }
+
+    .action-button {
+        min-height: 4rem;
+
+        &:focus, &:focus-visible {
+            outline: 2px solid var(--primary-foreground-color);
+            background-color: transparent;
+        }
+
+        .label {
+            font-size: 1.15rem;
+        }
+    }
+}

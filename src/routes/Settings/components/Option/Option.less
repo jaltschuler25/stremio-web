@@ -76,3 +76,45 @@
         }
     }
 }
+
+// TV: larger option rows, focusable controls
+:global(html.webos-tv) {
+    .option {
+        min-height: 4.5rem;
+        margin-bottom: 1.5rem;
+
+        .heading .label {
+            font-size: 1.1rem;
+        }
+
+        .content {
+            :global(.button) {
+                min-height: 4rem;
+                font-size: 1.05rem;
+
+                &:focus, &:focus-visible {
+                    outline: 2px solid var(--primary-foreground-color);
+                    background-color: transparent;
+                }
+            }
+
+            :global(.multiselect) {
+                min-height: 3.5rem;
+
+                &:focus-within {
+                    box-shadow: 0 0 0 2px var(--primary-foreground-color);
+                }
+            }
+
+            :global(.toggle), :global(.checkbox) {
+                min-height: 3.5rem;
+                min-width: 3.5rem;
+
+                &:focus, &:focus-visible {
+                    box-shadow: 0 0 0 2px var(--primary-foreground-color);
+                    outline: none;
+                }
+            }
+        }
+    }
+}

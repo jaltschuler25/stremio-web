@@ -1,0 +1,69 @@
+// Netflix-style circular seek indicator with ripple animation
+
+@keyframes seek-ripple {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    30% {
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0;
+    }
+}
+
+@keyframes seek-icon-pulse {
+    0% { opacity: 0.4; }
+    50% { opacity: 1; }
+    100% { opacity: 0.4; }
+}
+
+.seek-indicator {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 5;
+    pointer-events: none;
+
+    &.seek-forward {
+        right: 20%;
+    }
+
+    &.seek-backward {
+        left: 20%;
+    }
+}
+
+.seek-indicator-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 7rem;
+    height: 7rem;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    animation: seek-ripple 600ms ease-out forwards;
+}
+
+.seek-icon {
+    width: 1.6rem;
+    height: 1.6rem;
+    color: white;
+    animation: seek-icon-pulse 600ms ease-in-out;
+
+    &:nth-child(2) {
+        margin-top: -0.5rem;
+        animation-delay: 100ms;
+    }
+}
+
+.seek-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+    margin-top: 0.25rem;
+}

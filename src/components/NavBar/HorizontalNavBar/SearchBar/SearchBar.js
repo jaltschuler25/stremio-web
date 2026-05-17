@@ -16,6 +16,8 @@ const useLocalSearch = require('./useLocalSearch');
 const styles = require('./styles');
 const useBinaryState = require('stremio/common/useBinaryState');
 
+const isTV = () => typeof document !== 'undefined' && document.documentElement.classList.contains('webos-tv');
+
 const SearchBar = React.memo(({ className, query, active }) => {
     const { t } = useTranslation();
     const routeFocused = useRouteFocused();
@@ -108,7 +110,7 @@ const SearchBar = React.memo(({ className, query, active }) => {
                         type={'text'}
                         placeholder={t('SEARCH_OR_PASTE_LINK')}
                         defaultValue={query}
-                        tabIndex={-1}
+                        tabIndex={isTV() ? 0 : -1}
                         onChange={queryInputOnChange}
                         onPaste={queryInputOnPaste}
                         onSubmit={queryInputOnSubmit}

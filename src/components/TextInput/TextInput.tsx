@@ -5,6 +5,8 @@ import { type KeyboardEvent, type InputHTMLAttributes } from 'react';
 import classnames from 'classnames';
 import styles from './styles.less';
 
+const isTV = () => typeof document !== 'undefined' && document.documentElement.classList.contains('webos-tv');
+
 type Props = InputHTMLAttributes<HTMLInputElement> & {
     className?: string;
     disabled?: boolean;
@@ -18,6 +20,11 @@ const TextInput = forwardRef<HTMLInputElement, Props>((props, ref) => {
 
         if (event.key === 'Enter' ) {
             props.onSubmit && props.onSubmit(event);
+        }
+
+        // Prevent spatial navigation from stealing arrow keys while focused on a text input
+        if (isTV() && ['ArrowLeft', 'ArrowRight'].includes(event.key)) {
+            (event.nativeEvent as any).spatialNavigationPrevented = true;
         }
     }, [props.onKeyDown, props.onSubmit]);
 

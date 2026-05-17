@@ -299,3 +299,56 @@
         }
     }
 }
+
+// TV: larger hints, higher opacity, all search row items visible (carousel mode)
+.search-container {
+    :global(html.webos-tv) & {
+        .search-content {
+            .search-hints-wrapper {
+                .search-hints-title-container .search-hints-title {
+                    font-size: 2.2rem;
+                    opacity: 0.7;
+                }
+
+                .search-hints-container {
+                    max-width: 70%;
+                    padding: 3rem;
+
+                    .search-hint-container {
+                        flex: 0 0 50%;
+                        margin-bottom: 3rem;
+
+                        .icon {
+                            width: 5rem;
+                            height: 5rem;
+                            opacity: 0.7;
+                        }
+
+                        .label {
+                            font-size: 1.4rem;
+                            opacity: 0.7;
+                        }
+                    }
+                }
+            }
+
+            // Show all items in search rows -- carousel handles overflow
+            .search-row-poster, .search-row-square, .search-row-landscape {
+                .meta-item, .meta-item-placeholder {
+                    display: flex !important;
+                }
+            }
+
+            .message-container {
+                .image {
+                    width: 14rem;
+                    height: 14rem;
+                }
+
+                .message-label {
+                    font-size: 2rem;
+                }
+            }
+        }
+    }
+}

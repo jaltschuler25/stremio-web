@@ -6,6 +6,8 @@ import throttle from 'lodash.throttle';
 import { useRouteFocused } from 'stremio-router';
 import { usePlatform, useProfile, useStreamingServer, withCoreSuspender } from 'stremio/common';
 import { MainNavBars } from 'stremio/components';
+
+const isTV = () => typeof document !== 'undefined' && document.documentElement.classList.contains('webos-tv');
 import { SECTIONS } from './constants';
 import Menu from './Menu';
 import General from './General';
@@ -113,7 +115,7 @@ const Settings = () => {
                         streamingServer={streamingServer}
                     />
                     {
-                        !platform.isMobile && <Shortcuts ref={shortcutsSectionRef} />
+                        !platform.isMobile && !isTV() && <Shortcuts ref={shortcutsSectionRef} />
                     }
                     <Info streamingServer={streamingServer} />
                 </div>

@@ -10,11 +10,14 @@ const { default: Icon } = require('@stremio/stremio-icons/react');
 const { Modal } = require('stremio-router');
 const styles = require('./styles');
 
+const isTV = () => typeof document !== 'undefined' && document.documentElement.classList.contains('webos-tv');
+
 const ModalDialog = ({ className, title, buttons, children, dataset, onCloseRequest, background, ...props }) => {
     const { t } = useTranslation();
     const routeFocused = useRouteFocused();
     const modalsContainer = useModalsContainer();
     const modalContainerRef = React.useRef(null);
+    const dialogContentRef = React.useRef(null);
     const closeButtonOnClick = React.useCallback((event) => {
         if (typeof onCloseRequest === 'function') {
             onCloseRequest({
@@ -40,9 +43,12 @@ const ModalDialog = ({ className, title, buttons, children, dataset, onCloseRequ
     }, []);
     React.useEffect(() => {
         const onKeyDown = (event) => {
-            // its `-2` because focus lock render locking divs around its content
-            if (event.code === 'Escape' && modalsContainer.childNodes[modalsContainer.childElementCount - 2] === modalContainerRef.current) {
+            const isTopModal = modalsContainer.childNodes[modalsContainer.childElementCount - 2] === modalContainerRef.current;
+            // Escape or webOS Back button (keyCode 461) closes the modal
+            if ((event.code === 'Escape' || event.keyCode === 461) && isTopModal) {
                 if (typeof onCloseRequest === 'function') {
+                    event.preventDefault();
+                    event.stopPropagation();
                     onCloseRequest({
                         type: 'close',
                         dataset: dataset,
@@ -58,14 +64,24 @@ const ModalDialog = ({ className, title, buttons, children, dataset, onCloseRequ
             window.removeEventListener('keydown', onKeyDown);
         };
     }, [routeFocused, dataset, onCloseRequest]);
+    // TV: auto-focus first focusable element inside the modal
+    React.useEffect(() => {
+        if (!isTV() || !dialogContentRef.current) return;
+        const focusable = dialogContentRef.current.querySelector(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable) {
+            focusable.focus();
+        }
+    }, []);
     return (
         <Modal ref={modalContainerRef} {...props} className={classnames(className, styles['modal-container'])} onMouseDown={onModalContainerMouseDown}>
-            <div className={styles['modal-dialog-container']} onMouseDown={onModalDialogContainerMouseDown}>
+            <div className={styles['modal-dialog-container']} onMouseDown={onModalDialogContainerMouseDown} style={isTV() ? { '--spatial-navigation-contain': 'contain' } : undefined}>
                 <div className={styles['modal-dialog-background']} style={{backgroundImage: `url('${background}')`}} />
-                <Button className={styles['close-button-container']} title={t('BUTTON_CLOSE')} onClick={closeButtonOnClick}>
+                <Button className={styles['close-button-container']} title={t('BUTTON_CLOSE')} tabIndex={isTV() ? 0 : undefined} onClick={closeButtonOnClick}>
                     <Icon className={styles['icon']} name={'close'} />
                 </Button>
-                <div className={styles['modal-dialog-content']}>
+                <div ref={dialogContentRef} className={styles['modal-dialog-content']}>
                     {
                         typeof title === 'string' && title.length > 0 ?
                             <div className={styles['title-container']} title={title}>{title}</div>

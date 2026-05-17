@@ -12,6 +12,8 @@ const styles = require('./styles');
 const { usePlatform, useProfile } = require('stremio/common');
 const { default: SeasonEpisodePicker } = require('../EpisodePicker');
 
+const isTV = () => typeof document !== 'undefined' && document.documentElement.classList.contains('webos-tv');
+
 const ALL_ADDONS_KEY = 'ALL';
 
 const StreamsList = ({ className, video, type, onEpisodeSearch, ...props }) => {
@@ -67,13 +69,17 @@ const StreamsList = ({ className, video, type, onEpisodeSearch, ...props }) => {
             }, {});
     }, [props.streams]);
     const filteredStreams = React.useMemo(() => {
-        return selectedAddon === ALL_ADDONS_KEY ?
+        const allStreams = selectedAddon === ALL_ADDONS_KEY ?
             Object.values(streamsByAddon).map(({ streams }) => streams).flat(1)
             :
             streamsByAddon[selectedAddon] ?
                 streamsByAddon[selectedAddon].streams
                 :
                 [];
+
+        return allStreams.filter((stream) => {
+            return !(typeof stream.thumbnail === 'string' && stream.thumbnail.length > 0);
+        });
     }, [streamsByAddon, selectedAddon]);
     const selectableOptions = React.useMemo(() => {
         return {
@@ -98,13 +104,19 @@ const StreamsList = ({ className, video, type, onEpisodeSearch, ...props }) => {
         onEpisodeSearch(season, episode);
     }, [onEpisodeSearch]);
 
+    React.useEffect(() => {
+        if (streamsContainerRef.current) {
+            streamsContainerRef.current.scrollTo({ top: 0, left: 0 });
+        }
+    }, [filteredStreams]);
+
     return (
         <div className={classnames(className, styles['streams-list-container'])}>
             <div className={styles['select-choices-wrapper']}>
                 {
                     video ?
                         <React.Fragment>
-                            <Button className={classnames(styles['button-container'], styles['back-button-container'])} tabIndex={-1} onClick={backButtonOnClick}>
+                            <Button className={classnames(styles['button-container'], styles['back-button-container'])} tabIndex={isTV() ? 0 : -1} onClick={backButtonOnClick}>
                                 <Icon className={styles['icon']} name={'chevron-back'} />
                             </Button>
                             <div className={styles['episode-title']}>

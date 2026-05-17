@@ -21,6 +21,7 @@
         "@stremio/stremio-icons": "5.8.0",
         "@stremio/stremio-video": "0.0.73",
         "a-color-picker": "1.2.1",
+        "ajv": "^8.20.0",
         "bowser": "2.11.0",
         "buffer": "6.0.3",
         "classnames": "2.5.1",

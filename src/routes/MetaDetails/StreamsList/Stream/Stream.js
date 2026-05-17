@@ -10,7 +10,10 @@ const { Button, Image, Popup } = require('stremio/components');
 const { useServices } = require('stremio/services');
 const { useRouteFocused } = require('stremio-router');
 const StreamPlaceholder = require('./StreamPlaceholder');
+const parseTorrentInfo = require('./parseTorrentInfo');
 const styles = require('./styles');
+
+const isTV = () => typeof document !== 'undefined' && document.documentElement.classList.contains('webos-tv');
 
 const Stream = ({ className, videoId, videoReleased, addonName, name, description, thumbnail, progress, deepLinks, ...props }) => {
     const profile = useProfile();
@@ -198,9 +201,51 @@ const Stream = ({ className, videoId, videoReleased, addonName, name, descriptio
         <Icon className={styles['placeholder-icon']} name={'ic_broken_link'} />
     ), []);
 
+    const onStreamFocus = React.useCallback((event) => {
+        if (isTV() && event.currentTarget) {
+            event.currentTarget.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+            });
+        }
+    }, []);
+
+    const torrentInfo = React.useMemo(() => parseTorrentInfo(name, description), [name, description]);
+
     const renderLabel = React.useMemo(() => function renderLabel({ className, children, ...props }) {
+        if (torrentInfo) {
+            return (
+                <Button className={classnames(className, styles['stream-container'], styles['torrent-row'])} title={torrentInfo.title} href={href} target={target} download={download} onClick={onClick} onFocus={onStreamFocus} {...props}>
+                    <div className={styles['torrent-info']}>
+                        <div className={styles['torrent-title']}>{torrentInfo.title}</div>
+                        <div className={styles['torrent-meta']}>
+                            {torrentInfo.quality && <span className={styles['torrent-quality']}>{torrentInfo.quality}</span>}
+                            {torrentInfo.size && <span className={styles['torrent-size']}>{torrentInfo.size}</span>}
+                            {torrentInfo.seeders !== null && (
+                                <span className={styles['torrent-seeders']}>
+                                    <Icon className={styles['seeders-icon']} name={'person'} />
+                                    {torrentInfo.seeders}
+                                </span>
+                            )}
+                        </div>
+                        {
+                            progress !== null && !isNaN(progress) && progress > 0 ?
+                                <div className={styles['progress-bar-container']}>
+                                    <div className={styles['progress-bar']} style={{ width: `${progress}%` }} />
+                                    <div className={styles['progress-bar-background']} />
+                                </div>
+                                :
+                                null
+                        }
+                    </div>
+                    <Icon className={styles['icon']} name={'play'} />
+                    {children}
+                </Button>
+            );
+        }
+
         return (
-            <Button className={classnames(className, styles['stream-container'])} title={addonName} href={href} target={target} download={download} onClick={onClick} {...props}>
+            <Button className={classnames(className, styles['stream-container'])} title={addonName} href={href} target={target} download={download} onClick={onClick} onFocus={onStreamFocus} {...props}>
                 <div className={styles['info-container']}>
                     {
                         typeof thumbnail === 'string' && thumbnail.length > 0 ?
@@ -232,7 +277,7 @@ const Stream = ({ className, videoId, videoReleased, addonName, name, descriptio
                 {children}
             </Button>
         );
-    }, [thumbnail, progress, addonName, name, description, href, target, download, onClick]);
+    }, [torrentInfo, thumbnail, progress, addonName, name, description, href, target, download, onClick]);
 
     const renderMenu = React.useMemo(() => function renderMenu() {
         return (

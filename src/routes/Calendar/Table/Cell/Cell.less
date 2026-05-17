@@ -208,3 +208,30 @@
 @media screen and (max-width: @small) and (orientation: portrait) {
     .disable-cell-items();
 }
+
+// TV: larger cells, always-visible play icons, focusable
+:global(html.webos-tv) {
+    .cell {
+        min-height: 6rem;
+
+        .heading .day {
+            height: 2.5rem;
+            width: 2.5rem;
+            font-size: 1.2rem;
+        }
+
+        .items .item {
+            .icon {
+                opacity: 0.8;
+                width: 2.2rem;
+                height: 2.2rem;
+            }
+        }
+
+        &:focus, &:focus-visible {
+            outline: none;
+            border-color: var(--primary-foreground-color);
+            box-shadow: 0 0 0 1px var(--primary-foreground-color), 0 0 12px rgba(255, 255, 255, 0.15);
+        }
+    }
+}

@@ -84,6 +84,44 @@
             }
         }
     }
+
+    // TV: bigger row titles for 10-foot readability
+    :global(html.webos-tv) & {
+        .header-container .title-container {
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+    }
+
+    // TV carousel mode: horizontal overflow scroll instead of clipping items
+    :global(html.webos-tv) & {
+        .meta-items-container {
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scroll-padding-left: 1rem;
+            padding-bottom: 0.5rem;
+
+            .meta-item {
+                flex: none;
+                scroll-snap-align: start;
+
+                &.poster-shape-poster {
+                    width: 13rem;
+                }
+
+                &.poster-shape-square {
+                    width: 15rem;
+                }
+
+                &.poster-shape-landscape {
+                    width: 20rem;
+                }
+            }
+        }
+    }
 }
 
 @media only screen and (max-width: @minimum) {
